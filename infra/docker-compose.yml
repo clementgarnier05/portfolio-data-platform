@@ -41,18 +41,16 @@ services:
       - ../plugins:/opt/airflow/plugins
     ports:
       - "${AIRFLOW_PORT}:8080"
-    command: >
-      bash -c "
-        airflow db init &&
-        airflow users create \
-          --username admin \
-          --firstname Admin \
-          --lastname User \
-          --role Admin \
-          --email admin@example.com \
-          --password admin &&
-        airflow webserver
-      "
+    command:
+      bash -c "airflow db init &&
+                      airflow users create \
+                        --username admin \
+                        --firstname Admin \
+                        --lastname User \
+                        --role Admin \
+                        --email admin@example.com \
+                        --password admin &&
+                      airflow webserver"
 
   airflow-scheduler:
     image: apache/airflow:2.9.1
