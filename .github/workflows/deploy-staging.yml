@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Préparer le dossier staging sur VPS
-        uses: appleboy/ssh-action@v1.1.6
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
@@ -37,7 +37,7 @@ jobs:
           target: "/opt/portfolio-data-platform-staging"
 
       - name: Lancer stack staging
-        uses: appleboy/ssh-action@v1.1.6
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
