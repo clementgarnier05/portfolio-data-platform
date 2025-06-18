@@ -45,5 +45,5 @@ jobs:
           port: 22
           script: |
             cd /opt/portfolio-data-platform/infra || exit 0
-            docker compose --env-file ../.env.production pull
-            docker compose --env-file ../.env.production up -d --remove-orphans
+            docker compose -p --env-file ../.env.production pull
+            docker compose -p --env-file ../.env.production up -d --remove-orphans

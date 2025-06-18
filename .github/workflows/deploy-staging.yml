@@ -2,9 +2,11 @@ name: Déployer sur VPS (staging)
 
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - develop
   pull_request:
-    branches: [ develop ]
+    branches:
+      - develop
 
 jobs:
   deploy-staging:
@@ -14,19 +16,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      # 1) Prépare le dossier staging sur le VPS
       - name: Préparer le dossier staging sur VPS
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
           script: |
-            sudo mkdir -p /opt/portfolio-data-platform
+            sudo mkdir -p /opt/portfolio-data-platform-staging
             sudo chown -R ${{ secrets.VPS_USER }} /opt/portfolio-data-platform-staging
-            rm -rf /opt/portfolio-data-platform-staging/*
 
-      - name: Copier les fichiers vers production
+      # 2) Copier les fichiers vers staging
+      - name: Copier le code vers staging
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -36,8 +39,9 @@ jobs:
           source: "."
           target: "/opt/portfolio-data-platform-staging"
 
-      - name: Lancer stack staging
-        uses: appleboy/ssh-action@v1
+      # 3) Arrêter l’ancienne stack staging (nom de projet staging)
+      - name: Arrêter l’ancienne stack staging
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
@@ -45,5 +49,17 @@ jobs:
           port: 22
           script: |
             cd /opt/portfolio-data-platform-staging/infra || exit 0
-            docker compose --env-file ../.env.staging pull
-            docker compose --env-file ../.env.staging up -d --remove-orphans
+            docker compose -p staging --env-file ../.env.staging down -v || true
+
+      # 4) Démarrer la nouvelle stack staging avec -p staging
+      - name: Démarrer la stack staging
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            cd /opt/portfolio-data-platform-staging/infra || exit 0
+            docker compose -p staging --env-file ../.env.staging pull
+            docker compose -p staging --env-file ../.env.staging up -d --remove-orphans
