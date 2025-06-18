@@ -1,12 +1,3 @@
-version: '3.7'
-
-# NE PAS hardcoder ../.env.staging ici :
-# à la place, on laisse Compose sélectionner l'env-file passé en CLI.
-# MAIS si tu veux un fallback, tu peux lister les deux :
-env_file:
-  - ../.env      # fallback générique
-  - ../.env.staging  # surcharge pour staging via CLI
-
 services:
   redis:
     image: redis:7
