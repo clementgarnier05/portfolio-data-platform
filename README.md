@@ -6,6 +6,7 @@ Ce dépôt présente ma plateforme de Data Engineering personnelle, conçue pour
 
 Structure du projet
 
+```text
 portfolio-data-platform/
 ├── infra/           # Configuration Docker Compose 
 ├── dags/            # Pipelines Airflow (ETL/ELT)
@@ -15,6 +16,7 @@ portfolio-data-platform/
 ├── projects/        # Proof-of-concept isolés (ex: Strava)
 ├── docs/            # Documentation, diagrammes, captures d’écran
 └── .github/         # CI/CD workflows (déploiement VPS)
+```
 
 Premiers pas
 	1.	Copier le fichier d’environnement et renseigner les variables :
