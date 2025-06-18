@@ -31,6 +31,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
           script: |
-            cd ~/portfolio-data-platform/infra
+            cd /home/${{ secrets.VPS_USER }}/portfolio-data-platform/infra
             docker-compose pull
             docker-compose up -d --remove-orphans
