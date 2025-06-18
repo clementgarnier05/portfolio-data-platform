@@ -32,5 +32,5 @@ jobs:
           port: 22
           script: |
             cd /home/${{ secrets.VPS_USER }}/portfolio-data-platform/infra
-            docker-compose pull
-            docker-compose up -d --remove-orphans
+            docker compose pull
+            docker compose up -d --remove-orphans
