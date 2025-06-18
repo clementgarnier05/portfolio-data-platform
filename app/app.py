@@ -29,7 +29,7 @@ with body:
             st.markdown(f"###### 📚 Intérêts : {info['interest']}")
             st.markdown(f"###### 👀 LinkedIn : [{linkedin_link}]({linkedin_link})")
             # Téléchargement du CV
-            with open("CV_Garnier_Clement.pdf", "rb") as file:
+            with open("src/CV_Garnier_Clement.pdf", "rb") as file:
                 pdf_file = file.read()
             st.download_button(
                 label="📄 Télécharger mon CV",

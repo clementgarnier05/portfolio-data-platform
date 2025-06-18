@@ -1,3 +1,4 @@
 venv
 .env.production
 .env.staging
+projects/strava/credentials.json
