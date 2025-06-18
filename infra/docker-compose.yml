@@ -1,23 +1,27 @@
 version: '3.7'
+
 services:
+  # Broker Celery
   redis:
     image: redis:7
     ports:
-      - '6379:6379'
+      - "6379:6379"
 
+  # Metastore Airflow
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:   ${POSTGRES_DB}
     volumes:
       - postgres_db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       retries: 5
 
+  # Webserver Airflow
   airflow-webserver:
     image: apache/airflow:2.9.1
     depends_on:
@@ -26,16 +30,16 @@ services:
       redis:
         condition: service_healthy
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
-      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      _PIP_ADDITIONAL_REQUIREMENTS: "psycopg2-binary"
+      AIRFLOW__CORE__EXECUTOR:        CeleryExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+      AIRFLOW__CELERY__BROKER_URL:     redis://redis:6379/0
+      AIRFLOW__CORE__LOAD_EXAMPLES:    "false"
+      _PIP_ADDITIONAL_REQUIREMENTS:     "psycopg2-binary"
     volumes:
       - ../dags:/opt/airflow/dags
       - ../plugins:/opt/airflow/plugins
     ports:
-      - "8080:8080"
+      - "${AIRFLOW_PORT}:8080"
     command: >
       bash -c "
         airflow db init &&
@@ -49,36 +53,57 @@ services:
         airflow webserver
       "
 
+  # Scheduler Airflow
   airflow-scheduler:
     image: apache/airflow:2.9.1
     depends_on:
       - airflow-webserver
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CORE__EXECUTOR:        CeleryExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+      AIRFLOW__CELERY__BROKER_URL:     redis://redis:6379/0
     volumes:
       - ../dags:/opt/airflow/dags
       - ../plugins:/opt/airflow/plugins
     command: >
       bash -c "sleep 10 &&
-        airflow scheduler"
+        airflow scheduler
+      "
 
+  # Worker Celery
   airflow-worker:
     image: apache/airflow:2.9.1
     depends_on:
       - redis
       - postgres
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CORE__EXECUTOR:        CeleryExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+      AIRFLOW__CELERY__BROKER_URL:     redis://redis:6379/0
     volumes:
       - ../dags:/opt/airflow/dags
       - ../plugins:/opt/airflow/plugins
     command: >
       bash -c "sleep 15 &&
-        airflow celery worker"
+        airflow celery worker
+      "
+
+  # Front Streamlit
+  app:
+    image: python:3.10-slim
+    working_dir: /app
+    volumes:
+      - ../app:/app
+      - ../data:/data
+    environment:
+      DATA_DIR: /data
+    ports:
+      - "${STREAMLIT_PORT}:8501"
+    command: >
+      bash -c "
+        pip install -r requirements.txt &&
+        streamlit run app.py
+      "
 
 volumes:
   postgres_db:
