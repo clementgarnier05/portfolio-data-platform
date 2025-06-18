@@ -1,4 +1,4 @@
-name: Déployer sur VPS
+name: Déployer sur VPS (production)
 
 on:
   push:
@@ -7,13 +7,26 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy:
+  deploy-prod:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Récupérer le code
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Copier les fichiers sur le VPS
+      - name: Préparer le dossier prod sur VPS
+        uses: appleboy/ssh-action@v1.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            sudo mkdir -p /opt/portfolio-data-platform
+            sudo chown -R ${{ secrets.VPS_USER }} /opt/portfolio-data-platform
+            rm -rf /opt/portfolio-data-platform/*
+
+      - name: Copier les fichiers vers production
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -21,16 +34,16 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
           source: "."
-          target: "/home/${{ secrets.VPS_USER }}/portfolio-data-platform"
+          target: "/opt/portfolio-data-platform"
 
-      - name: Redémarrer les services Docker Compose
-        uses: appleboy/ssh-action@v0.1.7
+      - name: Lancer stack production
+        uses: appleboy/ssh-action@v1.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
           script: |
-            cd /home/${{ secrets.VPS_USER }}/portfolio-data-platform/infra
-            docker compose pull
-            docker compose up -d --remove-orphans
+            cd /opt/portfolio-data-platform/infra || exit 0
+            docker compose --env-file ../.env.production pull
+            docker compose --env-file ../.env.production up -d --remove-orphans
