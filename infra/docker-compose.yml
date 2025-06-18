@@ -64,7 +64,11 @@ services:
       - ../dags:/opt/airflow/dags
       - ../plugins:/opt/airflow/plugins
     command: >
-      bash -c "sleep 10 && airflow scheduler"
+         bash -c "
+           airflow db init &&
+           sleep 10 &&
+           airflow scheduler
+         "
 
   airflow-worker:
     image: apache/airflow:2.9.1
@@ -79,7 +83,11 @@ services:
       - ../dags:/opt/airflow/dags
       - ../plugins:/opt/airflow/plugins
     command: >
-      bash -c "sleep 15 && airflow celery worker"
+         bash -c "
+           airflow db init &&
+           sleep 15 &&
+           airflow celery worker
+         "
 
   app:
     image: python:3.10-slim
