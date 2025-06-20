@@ -2,8 +2,10 @@
 import time
 import json
 import requests
+import os
 
-CRED_PATH = "projects/strava/credentials.json"
+HERE = os.path.dirname(os.path.abspath(__file__))
+CRED_PATH = os.path.join(HERE, "credentials.json")
 STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token"
 
 def update_strava_tokens() -> None:
