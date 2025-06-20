@@ -1,4 +1,2 @@
-pyspark>=3.3.0
-delta-spark>=2.2.0
 requests
 python-dotenv
