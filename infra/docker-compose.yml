@@ -10,7 +10,7 @@ services:
       - "${REDIS_PORT}:6379"
 
   spark-master:
-    image: bitnami/spark:3
+    image: spark-base:latest
     hostname: spark-master
     ports:
       - "${SPARK_MASTER_RPC_PORT}:7077"   # master RPC
@@ -20,9 +20,11 @@ services:
       - SPARK_UI_PORT=8080
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - HADOOP_USER_NAME=root
+      - HADOOP_CONF_DIR=/opt/bitnami/spark/conf
 
   spark-worker:
-    image: bitnami/spark:3
+    image: spark-base:latest
     depends_on:
       - spark-master
     ports:
@@ -32,6 +34,8 @@ services:
       - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_MEMORY=2G
       - SPARK_WORKER_CORES=2
+      - HADOOP_USER_NAME=root
+      - HADOOP_CONF_DIR=/opt/bitnami/spark/conf
 
   postgres:
     image: postgres:15
