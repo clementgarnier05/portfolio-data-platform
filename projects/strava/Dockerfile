@@ -9,4 +9,5 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 WORKDIR /app
 COPY . /app
 
-ENTRYPOINT ["bash","-c"]
+ENTRYPOINT ["spark-submit"]
+CMD ["--master", "spark://spark-master:7077", "/app/bronze.py"]
