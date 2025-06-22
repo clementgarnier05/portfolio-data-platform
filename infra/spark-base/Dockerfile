@@ -1,8 +1,8 @@
 FROM bitnami/spark:3
-
 USER root
 
 COPY core-site.xml /opt/bitnami/spark/conf/core-site.xml
+COPY spark-defaults.conf /opt/bitnami/spark/conf/spark-defaults.conf
 
 RUN pip install --no-cache-dir pyspark>=3.3.0 \
  && mkdir -p /opt/bitnami/spark/jars \
