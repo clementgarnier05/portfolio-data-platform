@@ -7,6 +7,7 @@ from pyspark.sql.functions import lit
 from delta import configure_spark_with_delta_pip
 from strava_auth import get_access_token, update_strava_tokens
 
+
 builder = (
     SparkSession.builder
         .appName("StravaBronze")
@@ -15,6 +16,8 @@ builder = (
 )
 spark = configure_spark_with_delta_pip(builder).getOrCreate()
 
+print("CLASSPATH DRIVER =", spark.sparkContext._conf.get("spark.driver.extraClassPath", "non défini"))
+print("JARS dans jars :", spark.sparkContext._jsc.sc().listJars())
 update_strava_tokens()
 token = get_access_token()
 
