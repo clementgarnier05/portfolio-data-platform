@@ -1,1 +1,3 @@
 streamlit
+pyspark
+delta-spark
