@@ -4,10 +4,10 @@ import json
 import requests
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
-
+from delta import configure_spark_with_delta_pip
 from strava_auth import get_access_token, update_strava_tokens
 
-spark = (
+builder = (
     SparkSession.builder
     .appName("StravaBronze")
     .config("spark.jars.packages", "io.delta:delta-core_2.12:2.2.0")
@@ -15,6 +15,7 @@ spark = (
     .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     .getOrCreate()
 )
+spark = configure_spark_with_delta_pip(builder).getOrCreate()
 
 update_strava_tokens()
 token = get_access_token()
