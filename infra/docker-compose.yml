@@ -22,6 +22,8 @@ services:
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - HADOOP_USER_NAME=root
       - HADOOP_CONF_DIR=/opt/bitnami/spark/conf
+    volumes:
+      - "${DATA_HOST_PATH:-/tmp/data}:/data"
 
   spark-worker:
     image: spark-base:latest
@@ -36,6 +38,8 @@ services:
       - SPARK_WORKER_CORES=2
       - HADOOP_USER_NAME=root
       - HADOOP_CONF_DIR=/opt/bitnami/spark/conf
+    volumes:
+      - "${DATA_HOST_PATH:-/tmp/data}:/data"
 
   postgres:
     image: postgres:15
