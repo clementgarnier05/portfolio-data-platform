@@ -122,13 +122,15 @@ services:
          "
 
   app:
-    image: python:3.10-slim
+    image: spark-base:latest
     working_dir: /app
     volumes:
       - ../app:/app
       - ../data:/data
     environment:
       DATA_DIR: ${DATA_DIR}
+      SPARK_HOME: /opt/bitnami/spark
+      JAVA_HOME: /opt/bitnami/java
     ports:
       - "${STREAMLIT_PORT}:8501"
     command: >
