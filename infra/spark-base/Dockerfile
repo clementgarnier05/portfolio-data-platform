@@ -12,5 +12,6 @@ RUN pip install --no-cache-dir pyspark>=3.4.0 \
  && pip install --no-cache-dir delta-spark==4.0.0 \
  && mkdir -p /opt/bitnami/spark/jars \
  && cd /opt/bitnami/spark/jars \
- && curl -sSL -O https://repo1.maven.org/maven2/io/delta/delta-spark_2.13/4.0.0/delta-spark_2.13-4.0.0.jar
+ && curl -sSL -O https://repo1.maven.org/maven2/io/delta/delta-spark_2.13/4.0.0/delta-spark_2.13-4.0.0.jar \
+ && curl -sSL -O https://repo1.maven.org/maven2/io/delta/delta-storage_2.13/4.0.0/delta-storage_2.13-4.0.0.jar
 
