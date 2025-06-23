@@ -1,5 +1,6 @@
 import streamlit as st
-from constant import *  # Assure `constant.py` inclut `info`, `linkedin_link`, `github_links` et `menu` modifié via radio
+from pyspark.sql import SparkSession
+from constant import *
 
 # Configure la page
 st.set_page_config(page_title="Portfolio Clément Garnier", page_icon="🏠", layout="wide", initial_sidebar_state="expanded")
@@ -61,6 +62,27 @@ with body:
                 if st.button(f"Voir le code - {proj['title']}"):
                     st.markdown(f"[GitHub]({github_links[proj['repo']]})")
             st.markdown("---")
+    elif page == "Données":
+        st.header("Visualisation des activités Strava (Bronze)")
+        st.write("table Delta Bronze")
+        delta_path = "/data/bronze/strava_activities"
+
+        spark = (
+            SparkSession.builder
+            .appName("StreamlitQuickCheck")
+            .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+            .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+            .getOrCreate()
+        )
+
+        try:
+            df = spark.read.format("delta").load(delta_path)
+            pdf = df.toPandas()
+            st.dataframe(pdf, use_container_width=True)
+        except Exception as e:
+            st.error(f"Impossible de lire la table Delta : {e}")
+        finally:
+            spark.stop()
 
     else:  # Contacts
         st.header("Contact", divider='rainbow')
