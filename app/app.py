@@ -13,7 +13,7 @@ with body:
     st.sidebar.title("Navigation")
     page = st.sidebar.radio(
         "Choisissez une page:",
-        ["Introduction", "Expérience", "Portfolio", "Contacts", "Donnée"]
+        ["Introduction", "Expérience", "Portfolio", "Contacts", "Données"]
     )
     st.sidebar.markdown("---")
 
