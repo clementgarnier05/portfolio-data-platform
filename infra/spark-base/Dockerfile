@@ -12,5 +12,5 @@ COPY spark-defaults.conf /opt/bitnami/spark/conf/spark-defaults.conf
 RUN pip install --no-cache-dir pyspark>=3.4.0 && \
     mkdir -p /opt/bitnami/spark/jars && \
     cd /opt/bitnami/spark/jars && \
-    curl -sSLO https://repo1.maven.org/maven2/io/delta/delta-core_2.12/4.0.0/delta-core_2.12-4.0.0.jar && \
-    curl -sSLO https://repo1.maven.org/maven2/io/delta/delta-storage_2.12/4.0.0/delta-storage_2.12-4.0.0.jar
+    curl -sSL https://repo1.maven.org/maven2/io/delta/delta-spark_2.13/4.0.0/delta-spark_2.13-4.0.0.jar -O && \
+    curl -sSL https://repo1.maven.org/maven2/io/delta/delta-storage_2.13/4.0.0/delta-storage_2.13-4.0.0.jar -O
