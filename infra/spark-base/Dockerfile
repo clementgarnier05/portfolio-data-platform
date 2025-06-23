@@ -1,4 +1,4 @@
-FROM bitnami/spark:3
+FROM bitnami/spark:4
 USER root
 
 COPY core-site.xml /opt/bitnami/spark/conf/core-site.xml
