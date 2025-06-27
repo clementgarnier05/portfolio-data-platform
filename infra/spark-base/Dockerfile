@@ -5,6 +5,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends curl ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /opt/bitnami/spark/conf \
+ && touch /opt/bitnami/spark/conf/hadoop-metrics2.properties
+
 COPY core-site.xml /opt/bitnami/spark/conf/
 COPY spark-defaults.conf /opt/bitnami/spark/conf/
 
