@@ -6,13 +6,15 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
 from delta import configure_spark_with_delta_pip
 from strava_auth import get_access_token, update_strava_tokens
-
+import os
 
 builder = (
     SparkSession.builder
         .appName("StravaBronze")
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
 )
 spark = configure_spark_with_delta_pip(builder).getOrCreate()
 
@@ -42,8 +44,9 @@ df_raw = spark.read.json(spark.sparkContext.parallelize(all_acts))
 
 df_bronze = df_raw.withColumn("_ingest_timestamp", lit(int(time.time())))
 
-bronze_path = "/data/bronze/strava_activities"
-df_bronze.write.format("delta").mode("append").save(bronze_path)
+env = os.getenv("ENV", "staging")
+bucket = f"s3a://portfolio-data-lake/{env}/bronze/strava_activities"
+df_bronze.write.format("delta").mode("append").save(bucket)
 
 spark.stop()
 print("[bronze] Ingestion terminée.")
